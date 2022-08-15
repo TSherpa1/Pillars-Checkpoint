@@ -41,16 +41,31 @@ router.delete('/:id', async (req, res, next) => {
   try {
     if (isNaN(req.params.id)) {
       res.status(400).send('<h1>ID must be a number!</h1>');
-    }
-    let userToDelete = await User.findByPk(req.params.id);
-    if (!userToDelete) {
-      res.status(404).send('<h1>User not found!</h1>');
     } else {
-      await userToDelete.destroy();
-      res.status(204).send(userToDelete);
+      let userToDelete = await User.findByPk(req.params.id);
+      if (!userToDelete) {
+        res.status(404).send('<h1>User not found!</h1>');
+      } else {
+        await userToDelete.destroy();
+        res.status(204).send(userToDelete);
+      }
     }
   } catch (error) {
     next(error);
+  }
+});
+
+router.post('/', async (req, res, next) => {
+  let existingUser = await User.findOne({
+    where: {
+      name: req.body.name,
+    },
+  });
+  if (existingUser) {
+    res.status(409).send(`<h1>User with name ${req.body.name} already exists!`);
+  } else {
+    let newUser = await User.create(req.body);
+    res.status(201).send(newUser);
   }
 });
 
