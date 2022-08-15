@@ -31,11 +31,18 @@ router.get('/unassigned', async (req, res, next) => {
 router.get('/teachers', async (req, res, next) => {
   try {
     let teacherAndMeentes = await User.findTeachersAndMentees();
-    //let teacherAndMeentes = await User.findMentees();
+
     res.status(200).send(teacherAndMeentes);
   } catch (error) {
     next(error);
   }
+});
+
+//using route for testing
+router.get('/:id', async (req, res, next) => {
+  let user = await User.findByPk(req.params.id);
+  res.send(await user.getMentees());
+  //res.send(user);
 });
 
 router.delete('/:id', async (req, res, next) => {

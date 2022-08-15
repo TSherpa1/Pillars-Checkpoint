@@ -94,11 +94,15 @@ User.beforeUpdate(async function (user) {
       'You cannot update a student to a teacher when they have a mentor'
     );
   }
-  if (user.isStudent && user.getMentees().length > 0) {
-    throw new Error(
-      'You cannot update a teacher to a student when they have mentees'
-    );
+  //check if the user is a student, check if they have mentees
+  if ((await user.getMentees()).length > 0) {
+    if (user.isStudent) {
+      throw new Error(
+        'You cannot update a teacher to a student when they have mentees'
+      );
+    }
   }
-  console.log(await user.getMentees());
+
+  //console.log(`Mentees: ${user.getMentees().length}`);
 });
 module.exports = User;
