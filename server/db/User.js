@@ -16,6 +16,26 @@ const User = db.define('user', {
     defaultValue: 'STUDENT',
     allowNull: false,
   },
+  isStudent: {
+    type: Sequelize.VIRTUAL,
+    get() {
+      if (this.userType === 'STUDENT') {
+        return true;
+      } else {
+        return false;
+      }
+    },
+  },
+  isTeacher: {
+    type: Sequelize.VIRTUAL,
+    get() {
+      if (this.userType === 'TEACHER') {
+        return true;
+      } else {
+        return false;
+      }
+    },
+  },
 });
 
 /**
