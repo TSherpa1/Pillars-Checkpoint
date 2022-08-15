@@ -21,7 +21,7 @@ const {
 router.get('/unassigned', async (req, res, next) => {
   try {
     let unassignedStudents = await User.findUnassignedStudents();
-    console.log(unassignedStudents);
+    //console.log(unassignedStudents);
     res.status(200).send(unassignedStudents);
   } catch (error) {
     next(error);
@@ -31,6 +31,7 @@ router.get('/unassigned', async (req, res, next) => {
 router.get('/teachers', async (req, res, next) => {
   try {
     let teacherAndMeentes = await User.findTeachersAndMentees();
+    //let teacherAndMeentes = await User.findMentees();
     res.status(200).send(teacherAndMeentes);
   } catch (error) {
     next(error);
@@ -56,16 +57,38 @@ router.delete('/:id', async (req, res, next) => {
 });
 
 router.post('/', async (req, res, next) => {
-  let existingUser = await User.findOne({
-    where: {
-      name: req.body.name,
-    },
-  });
-  if (existingUser) {
-    res.status(409).send(`<h1>User with name ${req.body.name} already exists!`);
-  } else {
-    let newUser = await User.create(req.body);
-    res.status(201).send(newUser);
+  try {
+    let existingUser = await User.findOne({
+      where: {
+        name: req.body.name,
+      },
+    });
+    if (existingUser) {
+      res
+        .status(409)
+        .send(`<h1>User with name ${req.body.name} already exists!`);
+    } else {
+      let newUser = await User.create(req.body);
+      res.status(201).send(newUser);
+    }
+  } catch (error) {
+    next(error);
+  }
+});
+
+router.put('/:id', async (req, res, next) => {
+  try {
+    let userToUpdate = await User.findByPk(req.params.id);
+    //console.log(userToUpdate);
+    if (!userToUpdate) {
+      res.status(404).send(`<h1>Not a valid user ID!</h1>`);
+    } else {
+      userToUpdate.update(req.body);
+      res.status(200).send(userToUpdate);
+    }
+  } catch (error) {
+    //console.error(error);
+    next(error);
   }
 });
 

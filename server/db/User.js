@@ -80,4 +80,25 @@ User.findTeachersAndMentees = async function () {
   return teacherAndMeentes;
 };
 
+User.beforeUpdate(async function (user) {
+  let mentor = await User.findByPk(user.mentorId);
+  if (mentor) {
+    if (!mentor.isTeacher) {
+      throw new Error(
+        'You cannot update a student with a mentor who is not a teacher'
+      );
+    }
+  }
+  if (user.mentorId && user.isTeacher) {
+    throw new Error(
+      'You cannot update a student to a teacher when they have a mentor'
+    );
+  }
+  if (user.isStudent && user.getMentees().length > 0) {
+    throw new Error(
+      'You cannot update a teacher to a student when they have mentees'
+    );
+  }
+  console.log(await user.getMentees());
+});
 module.exports = User;
