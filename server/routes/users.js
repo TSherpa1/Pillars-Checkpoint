@@ -1,4 +1,5 @@
 const router = require('express').Router();
+const Sequelize = require('sequelize');
 const {
   models: { User },
 } = require('../db');
@@ -38,11 +39,25 @@ router.get('/teachers', async (req, res, next) => {
   }
 });
 
+router.get('/', async (req, res, next) => {
+  try {
+    let users = await User.findAll({
+      where: {
+        name: { [Sequelize.Op.iRegexp]: req.query.name },
+      },
+    });
+    res.status(200).send(users);
+  } catch (error) {
+    //console.log(error);
+    next(error);
+  }
+  //console.log(`Query: ${req.query.name}`);
+});
+
 //using route for testing
 router.get('/:id', async (req, res, next) => {
   let user = await User.findByPk(req.params.id);
   res.send(await user.getMentees());
-  //res.send(user);
 });
 
 router.delete('/:id', async (req, res, next) => {

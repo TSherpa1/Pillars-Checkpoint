@@ -105,4 +105,15 @@ User.beforeUpdate(async function (user) {
 
   //console.log(`Mentees: ${user.getMentees().length}`);
 });
+
+//checking to see where the instance's match the same mentorId
+User.prototype.getPeers = async function () {
+  let peers = await User.findAll({
+    where: {
+      mentorId: this.mentorId,
+      name: { [Sequelize.Op.not]: this.name },
+    },
+  });
+  return peers;
+};
 module.exports = User;
